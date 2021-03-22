@@ -90,10 +90,11 @@ int ogs_dict_s6a_entry(char *conffile)
 
 	/* Applications section */
     {
+        application_id_t id = 16777251;
+
         struct dict_object * vendor;
         CHECK_FCT(fd_dict_search(fd_g_config->cnf_dict, DICT_VENDOR, VENDOR_BY_NAME, "3GPP", &vendor, ENOENT));
-        struct dict_application_data app_data = { 16777251, "S6A" };
-        CHECK_FCT(fd_dict_new(fd_g_config->cnf_dict, DICT_APPLICATION, &app_data, vendor, &s6a));
+        CHECK_FCT(fd_dict_search(fd_g_config->cnf_dict, DICT_APPLICATION, APPLICATION_BY_ID, (void *)&id, &s6a, ENOENT));
     }
 
 	/* AVP section */

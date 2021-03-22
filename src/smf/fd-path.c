@@ -1075,14 +1075,14 @@ int smf_fd_init(void)
                 smf_self()->diam_conf_path, smf_self()->diam_config);
     ogs_assert(ret == 0);
 
-    vnd_data.vendor_id = 10415;
+    vnd_data.vendor_id = OGS_3GPP_VENDOR_ID;
     vnd_data.vendor_name = (char *) "3GPP";
 
     ret = fd_dict_new(fd_g_config->cnf_dict,
             DICT_VENDOR, &vnd_data, NULL, &vnd);
     ogs_assert(ret == 0);
 
-    gx_app_data.application_id = 16777238;
+    gx_app_data.application_id = OGS_DIAM_GX_APPLICATION_ID;
     gx_app_data.application_name = (char *) "Gx";
 
     ret = fd_dict_new(fd_g_config->cnf_dict, DICT_APPLICATION,

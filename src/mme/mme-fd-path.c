@@ -1167,14 +1167,14 @@ int mme_fd_init(void)
                 mme_self()->diam_conf_path, mme_self()->diam_config);
     ogs_assert(ret == OGS_OK);
 
-    vnd_data.vendor_id = 10415;
+    vnd_data.vendor_id = OGS_3GPP_VENDOR_ID;
     vnd_data.vendor_name = (char *) "3GPP";
 
     ret = fd_dict_new(fd_g_config->cnf_dict,
             DICT_VENDOR, &vnd_data, NULL, &vnd);
     ogs_assert(ret == 0);
 
-    s6a_app_data.application_id = 16777251;
+    s6a_app_data.application_id = OGS_DIAM_S6A_APPLICATION_ID;
     s6a_app_data.application_name = (char *) "S6A";
 
     ret = fd_dict_new(fd_g_config->cnf_dict, DICT_APPLICATION,
@@ -1189,8 +1189,7 @@ int mme_fd_init(void)
     ogs_assert(ret == OGS_OK);
 
     /* Create handler for sessions */
-	ret = fd_sess_handler_create(&mme_s6a_reg, &state_cleanup,
-                NULL, NULL);
+	ret = fd_sess_handler_create(&mme_s6a_reg, &state_cleanup, NULL, NULL);
     ogs_assert(ret == OGS_OK);
 
 	/* Advertise the support for the application in the peer */

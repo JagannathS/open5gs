@@ -33,14 +33,14 @@ int hss_fd_init(void)
                 hss_self()->diam_conf_path, hss_self()->diam_config);
     ogs_assert(ret == 0);
 
-    vnd_data.vendor_id = 10415;
+    vnd_data.vendor_id = OGS_3GPP_VENDOR_ID;
     vnd_data.vendor_name = (char *) "3GPP";
 
     ret = fd_dict_new(fd_g_config->cnf_dict,
             DICT_VENDOR, &vnd_data, NULL, &vnd);
     ogs_assert(ret == 0);
 
-    s6a_app_data.application_id = 16777251;
+    s6a_app_data.application_id = OGS_DIAM_S6A_APPLICATION_ID;
     s6a_app_data.application_name = (char *) "S6A";
 
     ret = fd_dict_new(fd_g_config->cnf_dict, DICT_APPLICATION,
