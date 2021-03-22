@@ -27,6 +27,9 @@ extern "C" {
 int hss_fd_init(void);
 void hss_fd_final(void);
 
+int hss_s6a_init(void);
+void hss_s6a_final(void);
+
 #ifdef __cplusplus
 }
 #endif

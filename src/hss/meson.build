@@ -18,8 +18,10 @@
 libhss_sources = files('''
     hss-context.h
     hss-fd-path.h
+
     hss-init.c
     hss-context.c
+    hss-s6a-path.c
     hss-fd-path.c
 '''.split())
 
