@@ -21,6 +21,7 @@
 #define HSS_CONTEXT_H
 
 #include "ogs-diameter-s6a.h"
+#include "ogs-diameter-cx.h"
 #include "ogs-dbi.h"
 #include "ogs-app.h"
 

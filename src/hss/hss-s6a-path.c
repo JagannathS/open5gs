@@ -71,7 +71,7 @@ static int hss_ogs_diam_s6a_air_cb( struct msg **msg, struct avp *avp,
 	
     ogs_assert(msg);
 
-    ogs_debug("[HSS] Authentication-Information-Request\n");
+    ogs_debug("Authentication-Information-Request");
 	
 	/* Create answer header */
 	qry = *msg;
@@ -233,7 +233,7 @@ static int hss_ogs_diam_s6a_air_cb( struct msg **msg, struct avp *avp,
 	ret = fd_msg_send(msg, NULL, NULL);
     ogs_assert(ret == 0);
 
-    ogs_debug("[HSS] Authentication-Information-Answer\n");
+    ogs_debug("Authentication-Information-Answer");
 	
 	/* Add this value to the stats */
 	ogs_assert(pthread_mutex_lock(&ogs_diam_logger_self()->stats_lock) == 0);
@@ -288,7 +288,7 @@ static int hss_ogs_diam_s6a_ulr_cb( struct msg **msg, struct avp *avp,
 
     ogs_assert(msg);
 
-    ogs_debug("[HSS] Update-Location-Request\n");
+    ogs_debug("Update-Location-Request");
 
     memset(&subscription_data, 0, sizeof(ogs_subscription_data_t));
 
@@ -744,7 +744,7 @@ static int hss_ogs_diam_s6a_ulr_cb( struct msg **msg, struct avp *avp,
 	ret = fd_msg_send(msg, NULL, NULL);
     ogs_assert(ret == 0);
 
-    ogs_debug("[HSS] Update-Location-Answer\n");
+    ogs_debug("Update-Location-Answer");
 	
 	/* Add this value to the stats */
 	ogs_assert( pthread_mutex_lock(&ogs_diam_logger_self()->stats_lock) == 0);
