@@ -2028,6 +2028,8 @@ int pcscf_fd_init(void)
     ret = ogs_diam_init(FD_MODE_CLIENT, NULL, &diam_config);
     ogs_assert(ret == 0);
 
+    pcscf_cx_init();
+
 	/* Install objects definitions for this application */
 	ret = ogs_diam_rx_init();
     ogs_assert(ret == 0);
@@ -2067,6 +2069,8 @@ void pcscf_fd_final(void)
 		(void) fd_disp_unregister(&hdl_rx_fb, NULL);
 	if (hdl_rx_asr)
 		(void) fd_disp_unregister(&hdl_rx_asr, NULL);
+
+    pcscf_cx_final();
 
     ogs_diam_final();
 }

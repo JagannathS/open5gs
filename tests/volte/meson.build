@@ -18,6 +18,7 @@
 testapp_volte_sources = files('''
     pcscf-fd-path.h
     pcscf-fd-path.c
+    pcscf-cx-path.c
 
     abts-main.c
     bearer-test.c
