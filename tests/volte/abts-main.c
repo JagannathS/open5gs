@@ -30,11 +30,12 @@ abts_suite *test_cx(abts_suite *suite);
 const struct testlist {
     abts_suite *(*func)(abts_suite *suite);
 } alltests[] = {
+#if 0
     {test_bearer},
     {test_session},
     {test_rx},
     {test_video},
-#if 0
+#else
     {test_cx},
 #endif
     {NULL},

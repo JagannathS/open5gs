@@ -458,6 +458,7 @@ void mme_s6a_send_ulr(mme_ue_t *mme_ue)
 
     /* Create the random value to store with the session */
     sess_data = ogs_calloc(1, sizeof(*sess_data));
+    ogs_assert(sess_data);
     sess_data->mme_ue = mme_ue;
 
     /* Create the request */

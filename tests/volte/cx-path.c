@@ -68,6 +68,8 @@ void icscf_cx_send_uar(test_ue_t *test_ue, int id_type)
     sess_data = ogs_calloc(1, sizeof (*sess_data));
     ogs_assert(sess_data);
 
+    sess_data->test_ue = test_ue;
+
     /* Create the request */
     ret = fd_msg_new(ogs_diam_cx_cmd_uar, MSGFL_ALLOC_ETEID, &req);
     ogs_assert(ret == 0);
@@ -101,6 +103,16 @@ void icscf_cx_send_uar(test_ue_t *test_ue, int id_type)
     ogs_assert(ret == 0);
     val.os.data = (unsigned char *)(fd_g_config->cnf_diamrlm);
     val.os.len  = strlen(fd_g_config->cnf_diamrlm);
+    ret = fd_msg_avp_setvalue(avp, &val);
+    ogs_assert(ret == 0);
+    ret = fd_msg_avp_add(req, MSG_BRW_LAST_CHILD, avp);
+    ogs_assert(ret == 0);
+
+    /* Set the Destination-Host AVP */
+    ret = fd_msg_avp_new(ogs_diam_destination_host, 0, &avp);
+    ogs_assert(ret == 0);
+    val.os.data = TEST_HSS_IDENTITY;
+    val.os.len  = strlen(TEST_HSS_IDENTITY);
     ret = fd_msg_avp_setvalue(avp, &val);
     ogs_assert(ret == 0);
     ret = fd_msg_avp_add(req, MSG_BRW_LAST_CHILD, avp);
@@ -153,7 +165,9 @@ static void test_cx_uaa_cb(void *data, struct msg **msg)
 
     test_ue_t *test_ue = NULL;
 
-    ogs_debug("User-Authroization-Answer");
+    ogs_fatal("User-Authroization-Answer");
+
+    ogs_expect_or_return(msg);
 
     ret = clock_gettime(CLOCK_REALTIME, &ts);
     ogs_assert(ret == 0);
