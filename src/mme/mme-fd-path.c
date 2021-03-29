@@ -1159,29 +1159,9 @@ static void mme_s6a_ula_cb(void *data, struct msg **msg)
 int mme_fd_init(void)
 {
     int ret;
-    struct dict_object *s6a_app, *vnd;
-    struct dict_vendor_data vnd_data;
-    struct dict_application_data s6a_app_data;
 
     ret = ogs_diam_init(FD_MODE_CLIENT,
                 mme_self()->diam_conf_path, mme_self()->diam_config);
-    ogs_assert(ret == OGS_OK);
-
-    vnd_data.vendor_id = OGS_3GPP_VENDOR_ID;
-    vnd_data.vendor_name = (char *) "3GPP";
-
-    ret = fd_dict_new(fd_g_config->cnf_dict,
-            DICT_VENDOR, &vnd_data, NULL, &vnd);
-    ogs_assert(ret == 0);
-
-    s6a_app_data.application_id = OGS_DIAM_S6A_APPLICATION_ID;
-    s6a_app_data.application_name = (char *) "S6A";
-
-    ret = fd_dict_new(fd_g_config->cnf_dict, DICT_APPLICATION,
-            &s6a_app_data, NULL, &s6a_app);
-    ogs_assert(ret == 0);
-
-    ret = fd_disp_app_support(s6a_app, vnd, 1, 0);
     ogs_assert(ret == 0);
 
 	/* Install objects definitions for this application */
@@ -1190,11 +1170,11 @@ int mme_fd_init(void)
 
     /* Create handler for sessions */
 	ret = fd_sess_handler_create(&mme_s6a_reg, &state_cleanup, NULL, NULL);
-    ogs_assert(ret == OGS_OK);
+    ogs_assert(ret == 0);
 
 	/* Advertise the support for the application in the peer */
 	ret = fd_disp_app_support(ogs_diam_s6a_application, ogs_diam_vendor, 1, 0);
-    ogs_assert(ret == OGS_OK);
+    ogs_assert(ret == 0);
 	
 	return 0;
 }
