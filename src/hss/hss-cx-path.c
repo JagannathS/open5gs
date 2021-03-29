@@ -289,7 +289,7 @@ int hss_cx_init(void)
                                 &data, NULL, &hdl_cx_fb);
     ogs_assert(ret == 0);
 	
-	/* Specific handler for Authentication-Information-Request */
+	/* Specific handler for User-Authorization-Request */
 	data.command = ogs_diam_cx_cmd_uar;
 	ret = fd_disp_register(hss_ogs_diam_cx_uar_cb, DISP_HOW_CC, &data, NULL,
                 &hdl_cx_uar);

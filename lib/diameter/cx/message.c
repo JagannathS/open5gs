@@ -39,9 +39,9 @@ int ogs_diam_cx_init(void)
             (void *)&id, &ogs_diam_cx_application);
 
     CHECK_dict_search(DICT_COMMAND, CMD_BY_NAME,
-            "User-Authorization-Request", &ogs_diam_cx_cmd_uar);
+            "3GPP/User-Authorization-Request", &ogs_diam_cx_cmd_uar);
     CHECK_dict_search(DICT_COMMAND, CMD_BY_NAME,
-            "User-Authorization-Answer", &ogs_diam_cx_cmd_uaa);
+            "3GPP/User-Authorization-Answer", &ogs_diam_cx_cmd_uaa);
 
     return 0;
 }
