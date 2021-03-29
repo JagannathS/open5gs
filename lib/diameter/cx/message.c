@@ -29,6 +29,7 @@ struct dict_object *ogs_diam_cx_cmd_uaa = NULL;
 
 struct dict_object *ogs_diam_cx_public_identity = NULL;
 struct dict_object *ogs_diam_cx_visited_network_identifier = NULL;
+struct dict_object *ogs_diam_cx_server_name = NULL;
 
 extern int ogs_dict_cx_entry(char *conffile);
 
@@ -51,6 +52,8 @@ int ogs_diam_cx_init(void)
     CHECK_dict_search(DICT_AVP, AVP_BY_NAME_ALL_VENDORS,
             "Visited-Network-Identifier",
             &ogs_diam_cx_visited_network_identifier);
+    CHECK_dict_search(DICT_AVP, AVP_BY_NAME_ALL_VENDORS,
+            "Server-Name", &ogs_diam_cx_server_name);
 
     return 0;
 }

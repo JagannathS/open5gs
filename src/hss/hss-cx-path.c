@@ -224,8 +224,14 @@ static int hss_ogs_diam_cx_uar_cb( struct msg **msg, struct avp *avp,
     ogs_assert(ret == 0);
 #endif
 
-	/* Set the Origin-Host, Origin-Realm, andResult-Code AVPs */
-	ret = fd_msg_rescode_set(ans, (char*)"DIAMETER_SUCCESS", NULL, NULL, 1);
+    /* Set Vendor-Specific-Application-Id AVP */
+    ret = ogs_diam_message_vendor_specific_appid_set(
+            ans, OGS_DIAM_CX_APPLICATION_ID);
+    ogs_assert(ret == 0);
+
+	/* Set the Experimental-Result, Origin-Host and Origin-Realm AVPs */
+    ret = ogs_diam_message_experimental_rescode_set(
+            ans, OGS_DIAM_CX_FIRST_REGISTRATION);
     ogs_assert(ret == 0);
 
     /* Set the Auth-Session-State AVP */
@@ -237,9 +243,16 @@ static int hss_ogs_diam_cx_uar_cb( struct msg **msg, struct avp *avp,
     ret = fd_msg_avp_add(ans, MSG_BRW_LAST_CHILD, avp);
     ogs_assert(ret == 0);
 
-    /* Set Vendor-Specific-Application-Id AVP */
-    ret = ogs_diam_message_vendor_specific_appid_set(
-            ans, OGS_DIAM_CX_APPLICATION_ID);
+#define SERVER_NAME "ims.localdomain"
+
+    /* Set the Server-Name AVP */
+    ret = fd_msg_avp_new(ogs_diam_cx_server_name, 0, &avp);
+    ogs_assert(ret == 0);
+    val.os.data = (unsigned char *)(SERVER_NAME);
+    val.os.len  = strlen(SERVER_NAME);
+    ret = fd_msg_avp_setvalue(avp, &val);
+    ogs_assert(ret == 0);
+    ret = fd_msg_avp_add(ans, MSG_BRW_LAST_CHILD, avp);
     ogs_assert(ret == 0);
 
 	/* Send the answer */
@@ -256,6 +269,12 @@ static int hss_ogs_diam_cx_uar_cb( struct msg **msg, struct avp *avp,
 	return 0;
 
 out:
+    /* Set Vendor-Specific-Application-Id AVP */
+    ret = ogs_diam_message_vendor_specific_appid_set(
+            ans, OGS_DIAM_CX_APPLICATION_ID);
+    ogs_assert(ret == 0);
+
+	/* Set the Experimental-Result, Origin-Host and Origin-Realm AVPs */
     ret = ogs_diam_message_experimental_rescode_set(ans, result_code);
     ogs_assert(ret == 0);
 
@@ -266,11 +285,6 @@ out:
     ret = fd_msg_avp_setvalue(avp, &val);
     ogs_assert(ret == 0);
     ret = fd_msg_avp_add(ans, MSG_BRW_LAST_CHILD, avp);
-    ogs_assert(ret == 0);
-
-    /* Set Vendor-Specific-Application-Id AVP */
-    ret = ogs_diam_message_vendor_specific_appid_set(
-            ans, OGS_DIAM_CX_APPLICATION_ID);
     ogs_assert(ret == 0);
 
 	ret = fd_msg_send(msg, NULL, NULL);

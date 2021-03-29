@@ -37,10 +37,25 @@ extern struct dict_object *ogs_diam_cx_cmd_uaa;
 
 extern struct dict_object *ogs_diam_cx_public_identity;
 extern struct dict_object *ogs_diam_cx_visited_network_identifier;
+extern struct dict_object *ogs_diam_cx_server_name;
 
 int ogs_diam_cx_init(void);
 
+#define OGS_DIAM_CX_FIRST_REGISTRATION                      2001
+#define OGS_DIAM_CX_SUBSEQUENT_REGISTRATION                 2002
+#define OGS_DIAM_CX_UNREGISTERED_SERVICE                    2003
+#define OGS_DIAM_CX_SERVER_NAME_NOT_STORED                  2004
 #define OGS_DIAM_CX_ERROR_USER_UNKNOWN                      5001
+#define OGS_DIAM_CX_ERROR_IDENTITIES_DONT_MATCH             5002
+#define OGS_DIAM_CX_ERROR_IDENTITY_NOT_REGISTERED           5003
+#define OGS_DIAM_CX_ERROR_ROAMING_NOT_ALLOWED               5004
+#define OGS_DIAM_CX_ERROR_IDENTITY_ALREADY_REGISTERED       5005
+#define OGS_DIAM_CX_ERROR_AUTH_SCHEME_NOT_SUPPORTED         5006
+#define OGS_DIAM_CX_ERROR_IN_ASSIGNMENT_TYPE                5007
+#define OGS_DIAM_CX_ERROR_TOO_MUCH_DATA                     5008
+#define OGS_DIAM_CX_ERROR_NOT_SUPPORTED_USER_DATA           5009
+#define OGS_DIAM_CX_ERROR_FEATURE_UNSUPPORTED               5011
+#define OGS_DIAM_CX_ERROR_SERVING_NODE_FEATURE_UNSUPPORTED  5012
 
 #ifdef __cplusplus
 }
