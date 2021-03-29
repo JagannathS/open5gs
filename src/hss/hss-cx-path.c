@@ -44,15 +44,16 @@ static int hss_ogs_diam_cx_uar_cb( struct msg **msg, struct avp *avp,
     int ret;
 
 	struct msg *ans, *qry;
+
+    struct avp_hdr *hdr;
+    union avp_value val;
 #if 0
     struct avp *avpch;
     struct avp *avp_e_utran_vector, *avp_xres, *avp_kasme, *avp_rand, *avp_autn;
-    struct avp_hdr *hdr;
-    union avp_value val;
 #endif
 
+    char *username = NULL;
 #if 0
-    char imsi_bcd[OGS_MAX_IMSI_BCD_LEN+1];
     uint8_t opc[OGS_KEY_LEN];
     uint8_t sqn[OGS_SQN_LEN];
     uint8_t autn[OGS_AUTN_LEN];
@@ -68,8 +69,8 @@ static int hss_ogs_diam_cx_uar_cb( struct msg **msg, struct avp *avp,
     ogs_dbi_auth_info_t auth_info;
     uint8_t zero[OGS_RAND_LEN];
     int rv;
-    uint32_t result_code = 0;
 #endif
+    uint32_t result_code = 0;
 	
     ogs_assert(msg);
 
@@ -81,14 +82,20 @@ static int hss_ogs_diam_cx_uar_cb( struct msg **msg, struct avp *avp,
     ogs_assert(ret == 0);
     ans = *msg;
 
-#if 0
     ret = fd_msg_search_avp(qry, ogs_diam_user_name, &avp);
     ogs_assert(ret == 0);
     ret = fd_msg_avp_hdr(avp, &hdr);
     ogs_assert(ret == 0);
-    ogs_cpystrn(imsi_bcd, (char*)hdr->avp_value->os.data, 
-        ogs_min(hdr->avp_value->os.len, OGS_MAX_IMSI_BCD_LEN)+1);
+    username = ogs_strndup(
+            (char *)hdr->avp_value->os.data,
+            hdr->avp_value->os.len);
+    ogs_assert(username);
+    ogs_fatal("Username = %s", username);
+    ogs_free(username);
 
+    result_code = OGS_DIAM_CX_ERROR_USER_UNKNOWN;
+
+#if 0
     rv = hss_db_auth_info(imsi_bcd, &auth_info);
     if (rv != OGS_OK) {
         result_code = OGS_DIAM_S6A_ERROR_USER_UNKNOWN;
@@ -235,7 +242,6 @@ static int hss_ogs_diam_cx_uar_cb( struct msg **msg, struct avp *avp,
 	/* Send the answer */
 	ret = fd_msg_send(msg, NULL, NULL);
     ogs_assert(ret == 0);
-#endif
 
     ogs_debug("[HSS] Authentication-Information-Answer");
 	
@@ -245,8 +251,8 @@ static int hss_ogs_diam_cx_uar_cb( struct msg **msg, struct avp *avp,
 	ogs_assert(pthread_mutex_unlock(&ogs_diam_logger_self()->stats_lock) == 0);
 
 	return 0;
+#endif
 
-#if 0
 out:
     ret = ogs_diam_message_experimental_rescode_set(ans, result_code);
     ogs_assert(ret == 0);
@@ -269,7 +275,6 @@ out:
     ogs_assert(ret == 0);
 
     return 0;
-#endif
 }
 
 int hss_cx_init(void)

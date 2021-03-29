@@ -40,6 +40,8 @@ extern struct dict_object *ogs_diam_cx_visited_network_identifier;
 
 int ogs_diam_cx_init(void);
 
+#define OGS_DIAM_CX_ERROR_USER_UNKNOWN                      5001
+
 #ifdef __cplusplus
 }
 #endif
