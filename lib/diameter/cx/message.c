@@ -27,6 +27,9 @@ struct dict_object *ogs_diam_cx_application = NULL;
 struct dict_object *ogs_diam_cx_cmd_uar = NULL;
 struct dict_object *ogs_diam_cx_cmd_uaa = NULL;
 
+struct dict_object *ogs_diam_cx_public_identity = NULL;
+struct dict_object *ogs_diam_cx_visited_network_identifier = NULL;
+
 extern int ogs_dict_cx_entry(char *conffile);
 
 int ogs_diam_cx_init(void)
@@ -42,6 +45,12 @@ int ogs_diam_cx_init(void)
             "3GPP/User-Authorization-Request", &ogs_diam_cx_cmd_uar);
     CHECK_dict_search(DICT_COMMAND, CMD_BY_NAME,
             "3GPP/User-Authorization-Answer", &ogs_diam_cx_cmd_uaa);
+
+    CHECK_dict_search(DICT_AVP, AVP_BY_NAME_ALL_VENDORS,
+            "Public-Identity", &ogs_diam_cx_public_identity);
+    CHECK_dict_search(DICT_AVP, AVP_BY_NAME_ALL_VENDORS,
+            "Visited-Network-Identifier",
+            &ogs_diam_cx_visited_network_identifier);
 
     return 0;
 }

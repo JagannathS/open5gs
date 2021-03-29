@@ -25,6 +25,7 @@ testapp_volte_sources = files('''
     session-test.c
     rx-test.c
     video-test.c
+    cx-test.c
 '''.split())
 
 testapp_volte_exe = executable('volte',

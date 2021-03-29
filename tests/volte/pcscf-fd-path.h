@@ -38,6 +38,8 @@ void pcscf_rx_send_aar_video(uint8_t **rx_sid, test_sess_t *sess, int id_type);
 void pcscf_rx_send_aar_ctrl(uint8_t **rx_sid, test_sess_t *sess, int id_type);
 void pcscf_rx_send_str(uint8_t *rx_sid);
 
+void icscf_cx_send_uar(test_ue_t *test_ue, int id_type);
+
 #ifdef __cplusplus
 }
 #endif

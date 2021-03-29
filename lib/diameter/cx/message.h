@@ -35,6 +35,9 @@ extern struct dict_object *ogs_diam_cx_application;
 extern struct dict_object *ogs_diam_cx_cmd_uar;
 extern struct dict_object *ogs_diam_cx_cmd_uaa;
 
+extern struct dict_object *ogs_diam_cx_public_identity;
+extern struct dict_object *ogs_diam_cx_visited_network_identifier;
+
 int ogs_diam_cx_init(void);
 
 #ifdef __cplusplus

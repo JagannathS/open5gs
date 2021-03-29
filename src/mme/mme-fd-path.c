@@ -58,17 +58,17 @@ void mme_s6a_send_air(mme_ue_t *mme_ue,
 
     /* Clear Security Context */
     CLEAR_SECURITY_CONTEXT(mme_ue);
-    
+
     /* Create the random value to store with the session */
     sess_data = ogs_calloc(1, sizeof (*sess_data));
     ogs_assert(sess_data);
-    
+
     sess_data->mme_ue = mme_ue;
-    
+
     /* Create the request */
     ret = fd_msg_new(ogs_diam_s6a_cmd_air, MSGFL_ALLOC_ETEID, &req);
     ogs_assert(ret == 0);
-    
+
     /* Create a new session */
     #define OGS_DIAM_S6A_APP_SID_OPT  "app_s6a"
     ret = fd_msg_new_session(req, (os0_t)OGS_DIAM_S6A_APP_SID_OPT, 
@@ -89,7 +89,7 @@ void mme_s6a_send_air(mme_ue_t *mme_ue,
     /* Set Origin-Host & Origin-Realm */
     ret = fd_msg_add_origin(req, 0);
     ogs_assert(ret == 0);
-    
+
     /* Set the Destination-Realm AVP */
     ret = fd_msg_avp_new(ogs_diam_destination_realm, 0, &avp);
     ogs_assert(ret == 0);
@@ -99,12 +99,12 @@ void mme_s6a_send_air(mme_ue_t *mme_ue,
     ogs_assert(ret == 0);
     ret = fd_msg_avp_add(req, MSG_BRW_LAST_CHILD, avp);
     ogs_assert(ret == 0);
-    
+
     /* Set the User-Name AVP */
     ret = fd_msg_avp_new(ogs_diam_user_name, 0, &avp);
     ogs_assert(ret == 0);
     val.os.data = (uint8_t *)mme_ue->imsi_bcd;
-    val.os.len  = strlen(mme_ue->imsi_bcd);
+    val.os.len = strlen(mme_ue->imsi_bcd);
     ret = fd_msg_avp_setvalue(avp, &val);
     ogs_assert(ret == 0);
     ret = fd_msg_avp_add(req, MSG_BRW_LAST_CHILD, avp);
@@ -163,16 +163,16 @@ void mme_s6a_send_air(mme_ue_t *mme_ue,
     
     ret = clock_gettime(CLOCK_REALTIME, &sess_data->ts);
     ogs_assert(ret == 0);
-    
-    /* Keep a pointer to the session data for debug purpose, 
+
+    /* Keep a pointer to the session data for debug purpose,
      * in real life we would not need it */
     svg = sess_data;
-    
+
     /* Store this value in the session */
     ret = fd_sess_state_store(mme_s6a_reg, session, &sess_data);
     ogs_assert(ret == 0);
     ogs_assert(sess_data == 0);
-    
+
     /* Send the request */
     ret = fd_msg_send(&req, mme_s6a_aia_cb, svg);
     ogs_assert(ret == 0);
@@ -455,15 +455,15 @@ void mme_s6a_send_ulr(mme_ue_t *mme_ue)
     ogs_assert(mme_ue);
 
     ogs_debug("[MME] Update-Location-Request");
-    
+
     /* Create the random value to store with the session */
     sess_data = ogs_calloc(1, sizeof(*sess_data));
     sess_data->mme_ue = mme_ue;
-    
+
     /* Create the request */
     ret = fd_msg_new(ogs_diam_s6a_cmd_ulr, MSGFL_ALLOC_ETEID, &req);
     ogs_assert(ret == 0);
-    
+
     /* Create a new session */
     #define OGS_DIAM_S6A_APP_SID_OPT  "app_s6a"
     ret = fd_msg_new_session(req, (os0_t)OGS_DIAM_S6A_APP_SID_OPT, 
@@ -484,7 +484,7 @@ void mme_s6a_send_ulr(mme_ue_t *mme_ue)
     /* Set Origin-Host & Origin-Realm */
     ret = fd_msg_add_origin(req, 0);
     ogs_assert(ret == 0);
-    
+
     /* Set the Destination-Realm AVP */
     ret = fd_msg_avp_new(ogs_diam_destination_realm, 0, &avp);
     ogs_assert(ret == 0);
@@ -494,7 +494,7 @@ void mme_s6a_send_ulr(mme_ue_t *mme_ue)
     ogs_assert(ret == 0);
     ret = fd_msg_avp_add(req, MSG_BRW_LAST_CHILD, avp);
     ogs_assert(ret == 0);
-    
+
     /* Set the User-Name AVP */
     ret = fd_msg_avp_new(ogs_diam_user_name, 0, &avp);
     ogs_assert(ret == 0);
@@ -576,16 +576,16 @@ void mme_s6a_send_ulr(mme_ue_t *mme_ue)
 
     ret = clock_gettime(CLOCK_REALTIME, &sess_data->ts);
     ogs_assert(ret == 0);
-    
-    /* Keep a pointer to the session data for debug purpose, 
+
+    /* Keep a pointer to the session data for debug purpose,
      * in real life we would not need it */
     svg = sess_data;
-    
+
     /* Store this value in the session */
     ret = fd_sess_state_store(mme_s6a_reg, session, &sess_data); 
     ogs_assert(ret == 0);
     ogs_assert(sess_data == 0);
-    
+
     /* Send the request */
     ret = fd_msg_send(&req, mme_s6a_ula_cb, svg);
     ogs_assert(ret == 0);
