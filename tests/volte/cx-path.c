@@ -25,7 +25,7 @@
 static struct disp_hdl *hdl_cx_fb = NULL; 
 static struct disp_hdl *hdl_cx_uaa = NULL; 
 
-static int pcscf_cx_fb_cb(struct msg **msg, struct avp *avp, 
+static int test_cx_fb_cb(struct msg **msg, struct avp *avp,
         struct session *sess, void *opaque, enum disp_action *act)
 {
 	/* This CB should never be called */
@@ -35,13 +35,13 @@ static int pcscf_cx_fb_cb(struct msg **msg, struct avp *avp,
 }
 
 /* Callback for incoming User-Authorization-Answer messages */
-static int pcscf_cx_uaa_cb( struct msg **msg, struct avp *avp, 
+static int test_cx_uaa_cb( struct msg **msg, struct avp *avp,
         struct session *session, void *opaque, enum disp_action *act)
 {
     return 0;
 }
 
-int pcscf_cx_init(void)
+int test_cx_init(void)
 {
     int ret;
 	struct disp_when data;
@@ -54,13 +54,13 @@ int pcscf_cx_init(void)
 	memset(&data, 0, sizeof(data));
 	data.app = ogs_diam_cx_application;
 
-	ret = fd_disp_register(pcscf_cx_fb_cb, DISP_HOW_APPID, &data, NULL,
+	ret = fd_disp_register(test_cx_fb_cb, DISP_HOW_APPID, &data, NULL,
                 &hdl_cx_fb);
     ogs_assert(ret == 0);
 	
 	/* Specific handler for User-Authorization-Answer */
 	data.command = ogs_diam_cx_cmd_uaa;
-	ret = fd_disp_register(pcscf_cx_uaa_cb, DISP_HOW_CC, &data, NULL,
+	ret = fd_disp_register(test_cx_uaa_cb, DISP_HOW_CC, &data, NULL,
                 &hdl_cx_uaa);
     ogs_assert(ret == 0);
 
@@ -71,7 +71,7 @@ int pcscf_cx_init(void)
 	return 0;
 }
 
-void pcscf_cx_final(void)
+void test_cx_final(void)
 {
 	if (hdl_cx_fb)
 		(void) fd_disp_unregister(&hdl_cx_fb, NULL);

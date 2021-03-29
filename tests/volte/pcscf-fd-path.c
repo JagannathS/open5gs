@@ -58,7 +58,7 @@ static void state_cleanup(struct sess_state *sess_data, os0_t sid, void *opaque)
     ogs_free(sess_data);
 }
 
-static int pcscf_rx_fb_cb(struct msg **msg, struct avp *avp, 
+static int pcscf_rx_fb_cb(struct msg **msg, struct avp *avp,
         struct session *sess, void *opaque, enum disp_action *act)
 {
 	/* This CB should never be called */
@@ -2028,7 +2028,7 @@ int pcscf_fd_init(void)
     ret = ogs_diam_init(FD_MODE_CLIENT, NULL, &diam_config);
     ogs_assert(ret == 0);
 
-    pcscf_cx_init();
+    test_cx_init();
 
 	/* Install objects definitions for this application */
 	ret = ogs_diam_rx_init();
@@ -2070,7 +2070,7 @@ void pcscf_fd_final(void)
 	if (hdl_rx_asr)
 		(void) fd_disp_unregister(&hdl_rx_asr, NULL);
 
-    pcscf_cx_final();
+    test_cx_final();
 
     ogs_diam_final();
 }
