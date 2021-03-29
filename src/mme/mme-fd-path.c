@@ -1114,12 +1114,12 @@ static void mme_s6a_ula_cb(void *data, struct msg **msg)
 
     /* Free the message */
     ogs_assert(pthread_mutex_lock(&ogs_diam_logger_self()->stats_lock) == 0);
-    dur = ((ts.tv_sec - sess_data->ts.tv_sec) * 1000000) + 
+    dur = ((ts.tv_sec - sess_data->ts.tv_sec) * 1000000) +
         ((ts.tv_nsec - sess_data->ts.tv_nsec) / 1000);
     if (ogs_diam_logger_self()->stats.nb_recv) {
         /* Ponderate in the avg */
-        ogs_diam_logger_self()->stats.avg = (ogs_diam_logger_self()->stats.avg * 
-            ogs_diam_logger_self()->stats.nb_recv + dur) / 
+        ogs_diam_logger_self()->stats.avg = (ogs_diam_logger_self()->stats.avg *
+            ogs_diam_logger_self()->stats.nb_recv + dur) /
             (ogs_diam_logger_self()->stats.nb_recv + 1);
         /* Min, max */
         if (dur < ogs_diam_logger_self()->stats.shortest)
@@ -1137,17 +1137,17 @@ static void mme_s6a_ula_cb(void *data, struct msg **msg)
         ogs_diam_logger_self()->stats.nb_recv++;
 
     ogs_assert(pthread_mutex_unlock(&ogs_diam_logger_self()->stats_lock) == 0);
-    
+
     /* Display how long it took */
     if (ts.tv_nsec > sess_data->ts.tv_nsec)
-        ogs_trace("in %d.%06ld sec", 
+        ogs_trace("in %d.%06ld sec",
                 (int)(ts.tv_sec - sess_data->ts.tv_sec),
                 (long)(ts.tv_nsec - sess_data->ts.tv_nsec) / 1000);
     else
-        ogs_trace("in %d.%06ld sec", 
+        ogs_trace("in %d.%06ld sec",
                 (int)(ts.tv_sec + 1 - sess_data->ts.tv_sec),
                 (long)(1000000000 + ts.tv_nsec - sess_data->ts.tv_nsec) / 1000);
-    
+
     ret = fd_msg_free(*msg);
     ogs_assert(ret == 0);
     *msg = NULL;

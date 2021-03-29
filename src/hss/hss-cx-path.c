@@ -74,7 +74,7 @@ static int hss_ogs_diam_cx_uar_cb( struct msg **msg, struct avp *avp,
 	
     ogs_assert(msg);
 
-    ogs_fatal("User-Authorization-Request");
+    ogs_debug("User-Authorization-Request");
 	
 	/* Create answer header */
 	qry = *msg;
@@ -90,15 +90,17 @@ static int hss_ogs_diam_cx_uar_cb( struct msg **msg, struct avp *avp,
             (char *)hdr->avp_value->os.data,
             hdr->avp_value->os.len);
     ogs_assert(username);
+
+#if 1 /* Will Remove */
     ogs_fatal("Username = %s", username);
     ogs_free(username);
-
     result_code = OGS_DIAM_CX_ERROR_USER_UNKNOWN;
+#endif
 
 #if 0
     rv = hss_db_auth_info(imsi_bcd, &auth_info);
     if (rv != OGS_OK) {
-        result_code = OGS_DIAM_S6A_ERROR_USER_UNKNOWN;
+        result_code = OGS_DIAM_CX_ERROR_USER_UNKNOWN;
         goto out;
     }
 
@@ -141,7 +143,7 @@ static int hss_ogs_diam_cx_uar_cb( struct msg **msg, struct avp *avp,
                     OGS_MAC_S_LEN);
                 ogs_log_print(OGS_LOG_ERROR, "SQN: ");
                 ogs_log_hexdump(OGS_LOG_ERROR, sqn, OGS_SQN_LEN);
-                result_code = OGS_DIAM_S6A_AUTHENTICATION_DATA_UNAVAILABLE;
+                result_code = OGS_DIAM_CX_AUTHENTICATION_DATA_UNAVAILABLE;
                 goto out;
             }
         }
@@ -150,14 +152,14 @@ static int hss_ogs_diam_cx_uar_cb( struct msg **msg, struct avp *avp,
     rv = hss_db_update_rand_and_sqn(imsi_bcd, auth_info.rand, auth_info.sqn);
     if (rv != OGS_OK) {
         ogs_error("Cannot update rand and sqn for IMSI:'%s'", imsi_bcd);
-        result_code = OGS_DIAM_S6A_AUTHENTICATION_DATA_UNAVAILABLE;
+        result_code = OGS_DIAM_CX_AUTHENTICATION_DATA_UNAVAILABLE;
         goto out;
     }
 
     rv = hss_db_increment_sqn(imsi_bcd);
     if (rv != OGS_OK) {
         ogs_error("Cannot increment sqn for IMSI:'%s'", imsi_bcd);
-        result_code = OGS_DIAM_S6A_AUTHENTICATION_DATA_UNAVAILABLE;
+        result_code = OGS_DIAM_CX_AUTHENTICATION_DATA_UNAVAILABLE;
         goto out;
     }
 
@@ -220,6 +222,7 @@ static int hss_ogs_diam_cx_uar_cb( struct msg **msg, struct avp *avp,
     ogs_assert(ret == 0);
     ret = fd_msg_avp_add(ans, MSG_BRW_LAST_CHILD, avp);
     ogs_assert(ret == 0);
+#endif
 
 	/* Set the Origin-Host, Origin-Realm, andResult-Code AVPs */
 	ret = fd_msg_rescode_set(ans, (char*)"DIAMETER_SUCCESS", NULL, NULL, 1);
@@ -236,14 +239,14 @@ static int hss_ogs_diam_cx_uar_cb( struct msg **msg, struct avp *avp,
 
     /* Set Vendor-Specific-Application-Id AVP */
     ret = ogs_diam_message_vendor_specific_appid_set(
-            ans, OGS_DIAM_S6A_APPLICATION_ID);
+            ans, OGS_DIAM_CX_APPLICATION_ID);
     ogs_assert(ret == 0);
 
 	/* Send the answer */
 	ret = fd_msg_send(msg, NULL, NULL);
     ogs_assert(ret == 0);
 
-    ogs_debug("[HSS] Authentication-Information-Answer");
+    ogs_debug("User-Authorization-Answer");
 	
 	/* Add this value to the stats */
 	ogs_assert(pthread_mutex_lock(&ogs_diam_logger_self()->stats_lock) == 0);
@@ -251,7 +254,6 @@ static int hss_ogs_diam_cx_uar_cb( struct msg **msg, struct avp *avp,
 	ogs_assert(pthread_mutex_unlock(&ogs_diam_logger_self()->stats_lock) == 0);
 
 	return 0;
-#endif
 
 out:
     ret = ogs_diam_message_experimental_rescode_set(ans, result_code);
@@ -268,7 +270,7 @@ out:
 
     /* Set Vendor-Specific-Application-Id AVP */
     ret = ogs_diam_message_vendor_specific_appid_set(
-            ans, OGS_DIAM_S6A_APPLICATION_ID);
+            ans, OGS_DIAM_CX_APPLICATION_ID);
     ogs_assert(ret == 0);
 
 	ret = fd_msg_send(msg, NULL, NULL);

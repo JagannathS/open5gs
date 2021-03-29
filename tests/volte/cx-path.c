@@ -64,6 +64,8 @@ void icscf_cx_send_uar(test_ue_t *test_ue, int id_type)
 
     ogs_assert(test_ue);
 
+    ogs_debug("User-Authroization-Request");
+
     /* Create the random value to store with the session */
     sess_data = ogs_calloc(1, sizeof (*sess_data));
     ogs_assert(sess_data);
@@ -85,6 +87,11 @@ void icscf_cx_send_uar(test_ue_t *test_ue, int id_type)
     ret = fd_msg_sess_get(fd_g_config->cnf_dict, req, &session, NULL);
     ogs_assert(ret == 0);
 
+    /* Set Vendor-Specific-Application-Id AVP */
+    ret = ogs_diam_message_vendor_specific_appid_set(
+            req, OGS_DIAM_CX_APPLICATION_ID);
+    ogs_assert(ret == 0);
+
     /* Set the Auth-Session-State AVP */
     ret = fd_msg_avp_new(ogs_diam_auth_session_state, 0, &avp);
     ogs_assert(ret == 0);
@@ -98,21 +105,21 @@ void icscf_cx_send_uar(test_ue_t *test_ue, int id_type)
     ret = fd_msg_add_origin(req, 0);
     ogs_assert(ret == 0);
 
-    /* Set the Destination-Realm AVP */
-    ret = fd_msg_avp_new(ogs_diam_destination_realm, 0, &avp);
-    ogs_assert(ret == 0);
-    val.os.data = (unsigned char *)(fd_g_config->cnf_diamrlm);
-    val.os.len  = strlen(fd_g_config->cnf_diamrlm);
-    ret = fd_msg_avp_setvalue(avp, &val);
-    ogs_assert(ret == 0);
-    ret = fd_msg_avp_add(req, MSG_BRW_LAST_CHILD, avp);
-    ogs_assert(ret == 0);
-
     /* Set the Destination-Host AVP */
     ret = fd_msg_avp_new(ogs_diam_destination_host, 0, &avp);
     ogs_assert(ret == 0);
     val.os.data = TEST_HSS_IDENTITY;
     val.os.len  = strlen(TEST_HSS_IDENTITY);
+    ret = fd_msg_avp_setvalue(avp, &val);
+    ogs_assert(ret == 0);
+    ret = fd_msg_avp_add(req, MSG_BRW_LAST_CHILD, avp);
+    ogs_assert(ret == 0);
+
+    /* Set the Destination-Realm AVP */
+    ret = fd_msg_avp_new(ogs_diam_destination_realm, 0, &avp);
+    ogs_assert(ret == 0);
+    val.os.data = (unsigned char *)(fd_g_config->cnf_diamrlm);
+    val.os.len  = strlen(fd_g_config->cnf_diamrlm);
     ret = fd_msg_avp_setvalue(avp, &val);
     ogs_assert(ret == 0);
     ret = fd_msg_avp_add(req, MSG_BRW_LAST_CHILD, avp);
@@ -128,9 +135,24 @@ void icscf_cx_send_uar(test_ue_t *test_ue, int id_type)
     ret = fd_msg_avp_add(req, MSG_BRW_LAST_CHILD, avp);
     ogs_assert(ret == 0);
 
-    /* Set Vendor-Specific-Application-Id AVP */
-    ret = ogs_diam_message_vendor_specific_appid_set(
-            req, OGS_DIAM_CX_APPLICATION_ID);
+    /* Set the Public-Identity AVP */
+    ret = fd_msg_avp_new(ogs_diam_cx_public_identity, 0, &avp);
+    ogs_assert(ret == 0);
+    val.os.data = (uint8_t *)test_ue->imsi;
+    val.os.len = strlen(test_ue->imsi);
+    ret = fd_msg_avp_setvalue(avp, &val);
+    ogs_assert(ret == 0);
+    ret = fd_msg_avp_add(req, MSG_BRW_LAST_CHILD, avp);
+    ogs_assert(ret == 0);
+
+    /* Set the Visited-Network-Identifier AVP */
+    ret = fd_msg_avp_new(ogs_diam_cx_visited_network_identifier, 0, &avp);
+    ogs_assert(ret == 0);
+    val.os.data = (unsigned char *)(fd_g_config->cnf_diamrlm);
+    val.os.len  = strlen(fd_g_config->cnf_diamrlm);
+    ret = fd_msg_avp_setvalue(avp, &val);
+    ogs_assert(ret == 0);
+    ret = fd_msg_avp_add(req, MSG_BRW_LAST_CHILD, avp);
     ogs_assert(ret == 0);
 
     ret = clock_gettime(CLOCK_REALTIME, &sess_data->ts);
@@ -159,15 +181,17 @@ void icscf_cx_send_uar(test_ue_t *test_ue, int id_type)
 static void test_cx_uaa_cb(void *data, struct msg **msg)
 {
     int ret, new;
+
+    unsigned long dur;
+    int error = 0;
+
     struct sess_state *sess_data = NULL;
     struct timespec ts;
     struct session *session;
 
     test_ue_t *test_ue = NULL;
 
-    ogs_fatal("User-Authroization-Answer");
-
-    ogs_expect_or_return(msg);
+    ogs_debug("User-Authroization-Answer");
 
     ret = clock_gettime(CLOCK_REALTIME, &ts);
     ogs_assert(ret == 0);
@@ -184,6 +208,49 @@ static void test_cx_uaa_cb(void *data, struct msg **msg)
 
     test_ue = sess_data->test_ue;
     ogs_assert(test_ue);
+
+    /* Free the message */
+    ogs_assert(pthread_mutex_lock(&ogs_diam_logger_self()->stats_lock) == 0);
+    dur = ((ts.tv_sec - sess_data->ts.tv_sec) * 1000000) +
+        ((ts.tv_nsec - sess_data->ts.tv_nsec) / 1000);
+    if (ogs_diam_logger_self()->stats.nb_recv) {
+        /* Ponderate in the avg */
+        ogs_diam_logger_self()->stats.avg = (ogs_diam_logger_self()->stats.avg *
+            ogs_diam_logger_self()->stats.nb_recv + dur) /
+            (ogs_diam_logger_self()->stats.nb_recv + 1);
+        /* Min, max */
+        if (dur < ogs_diam_logger_self()->stats.shortest)
+            ogs_diam_logger_self()->stats.shortest = dur;
+        if (dur > ogs_diam_logger_self()->stats.longest)
+            ogs_diam_logger_self()->stats.longest = dur;
+    } else {
+        ogs_diam_logger_self()->stats.shortest = dur;
+        ogs_diam_logger_self()->stats.longest = dur;
+        ogs_diam_logger_self()->stats.avg = dur;
+    }
+    if (error)
+        ogs_diam_logger_self()->stats.nb_errs++;
+    else
+        ogs_diam_logger_self()->stats.nb_recv++;
+
+    ogs_assert(pthread_mutex_unlock(&ogs_diam_logger_self()->stats_lock) == 0);
+
+    /* Display how long it took */
+    if (ts.tv_nsec > sess_data->ts.tv_nsec)
+        ogs_trace("in %d.%06ld sec",
+                (int)(ts.tv_sec - sess_data->ts.tv_sec),
+                (long)(ts.tv_nsec - sess_data->ts.tv_nsec) / 1000);
+    else
+        ogs_trace("in %d.%06ld sec",
+                (int)(ts.tv_sec + 1 - sess_data->ts.tv_sec),
+                (long)(1000000000 + ts.tv_nsec - sess_data->ts.tv_nsec) / 1000);
+
+    ret = fd_msg_free(*msg);
+    ogs_assert(ret == 0);
+    *msg = NULL;
+
+    state_cleanup(sess_data, NULL, NULL);
+    return;
 }
 
 int test_cx_init(void)
@@ -207,12 +274,6 @@ int test_cx_init(void)
                 &hdl_cx_fb);
     ogs_assert(ret == 0);
 	
-	/* Specific handler for User-Authorization-Answer */
-	data.command = ogs_diam_cx_cmd_uaa;
-	ret = fd_disp_register(test_cx_uaa_cb, DISP_HOW_CC, &data, NULL,
-                &hdl_cx_uaa);
-    ogs_assert(ret == 0);
-
 	/* Advertise the support for the application in the peer */
 	ret = fd_disp_app_support(ogs_diam_cx_application, ogs_diam_vendor, 1, 0);
     ogs_assert(ret == 0);
